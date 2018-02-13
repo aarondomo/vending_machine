@@ -20,6 +20,7 @@ public class MainActivityPresenter {
     private int insertedAmount = 0;
 
     private static final String TAG = MainActivityPresenter.class.getName();
+    private static final String EMPTY_STRING = "";
 
     public void attachView(MainActivityPresenter.View view){
         this.view = view;
@@ -30,6 +31,9 @@ public class MainActivityPresenter {
     }
 
     public void receiveCoin(String coinValue){
+        if(coinValue == null){
+            coinValue = EMPTY_STRING;
+        }
         int coin = getCoinValue(coinValue);
         if(coin != -1){
             insertedAmount += coin;

@@ -31,6 +31,10 @@ which will remain with the last value until a new operation is made because the 
 
 
 
+![Alt text](app_screenshot.png)
+
+
+
 *****************************************************************************************************************************I
 
 Vending Machine Kata in Android

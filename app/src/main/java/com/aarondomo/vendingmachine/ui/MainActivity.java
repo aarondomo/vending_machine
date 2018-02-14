@@ -20,6 +20,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityPrese
     private TextView textViewDisplay;
     private EditText editTextCoinSlot;
     private Button buttonInsertCoin;
+    private Button buttonMoneyBack;
     private TextView textViewCoinReturn;
     private TextView textViewProductDispatch;
 
@@ -32,6 +33,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityPrese
 
         bindViews();
         setUpButtonInsertCoinOnClickListener();
+        setUpButtonMoneyBackOnClickListener();
 
         //TODO: inject the presenter with Dagger2
         presenter = new MainActivityPresenter();
@@ -46,6 +48,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityPrese
         textViewDisplay = (TextView) findViewById(R.id.textView_main_display);
         editTextCoinSlot = (EditText) findViewById(R.id.editText_main_coinSlot);
         buttonInsertCoin = (Button) findViewById(R.id.button_main_insertCoin);
+        buttonMoneyBack = (Button) findViewById(R.id.button_main_moneyBack);
         textViewCoinReturn = (TextView) findViewById(R.id.textView_main_coinReturn);
         textViewProductDispatch = (TextView) findViewById(R.id.textView_main_productDispatch);
     }
@@ -56,6 +59,15 @@ public class MainActivity extends AppCompatActivity implements MainActivityPrese
             public void onClick(View view) {
                 getCoin();
                 editTextCoinSlot.setText("");
+            }
+        });
+    }
+
+    private void setUpButtonMoneyBackOnClickListener(){
+        buttonMoneyBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                presenter.getMoneyBack();
             }
         });
     }

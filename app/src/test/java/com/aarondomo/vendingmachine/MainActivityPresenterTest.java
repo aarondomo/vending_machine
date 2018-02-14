@@ -9,7 +9,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.robolectric.RobolectricTestRunner;
 
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
@@ -158,5 +157,18 @@ public class MainActivityPresenterTest {
 
     }
 
+    @Test
+    public void getMoneyBack_should_return_coin_and_display_insert_coin() throws Exception {
+
+        String coinValue = "25";
+
+        subject.receiveCoin(coinValue);
+
+        subject.getMoneyBack();
+
+        verify(mockView).returnCoin(coinValue);
+        verify(mockView).displayDelayedMessage(INSERT_COIN_MSG);
+
+    }
 
 }

@@ -40,6 +40,12 @@
             android:id="@+id/button_main_insertCoin"
             android:text="Insert"/>
 
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/button_main_moneyBack"
+            android:text="@string/money_back"/>
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

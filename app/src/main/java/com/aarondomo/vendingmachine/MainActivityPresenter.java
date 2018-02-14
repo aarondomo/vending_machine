@@ -106,5 +106,10 @@ public class MainActivityPresenter {
     }
 
 
+    public void getMoneyBack() {
+        view.returnCoin(Integer.toString(insertedAmount));
+        insertedAmount = 0;
+        view.displayMessage(INSERT_COIN_MSG);
+    }
 
 }

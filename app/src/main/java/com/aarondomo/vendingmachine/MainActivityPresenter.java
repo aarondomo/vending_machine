@@ -88,10 +88,12 @@ public class MainActivityPresenter {
     public void dispatchProduct(Product product) {
         int price = product.getPrice();
         if(insertedAmount >= price){
-            insertedAmount = insertedAmount - price;
+            int change = insertedAmount - price;
+            insertedAmount = 0;
             view.displayMessage(THANK_YOU_MSG);
             view.setProductDispatched(product.getName());
             view.displayDelayedMessage(INSERT_COIN_MSG);
+            view.returnCoin(Integer.toString(change));
         } else {
             view.displayMessage(PRICE_MSG + product.getPrice());
             if(insertedAmount == 0){

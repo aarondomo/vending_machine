@@ -1,12 +1,12 @@
 package com.aarondomo.vendingmachine;
 
 
-import android.util.Log;
-
-import com.aarondomo.vendingmachine.utils.Coins;
+import com.aarondomo.vendingmachine.model.PettyCash;
 import com.aarondomo.vendingmachine.model.Inventory;
 import com.aarondomo.vendingmachine.model.Product;
+import com.aarondomo.vendingmachine.utils.CoinsUtil;
 
+import java.util.LinkedList;
 import java.util.List;
 
 public class MainActivityPresenter {
@@ -26,10 +26,9 @@ public class MainActivityPresenter {
     }
 
     private View view;
-    private int insertedAmount = 0;
     private Inventory inventory;
-
-    private static final String TAG = MainActivityPresenter.class.getName();
+    private PettyCash pettyCash;
+    private List<Integer> insertedCoins;
 
     private static final String EMPTY_STRING = "";
 
@@ -37,10 +36,13 @@ public class MainActivityPresenter {
     private static final String INSERT_COIN_MSG = "INSERT_COIN";
     private static final String PRICE_MSG = "PRICE: ";
     private static final String SOLD_OUT = "SOLD OUT";
+    private static final String EXACT_CHANGE_MSG = "EXACT CHANGE ONLY" ;
 
     public MainActivityPresenter(){
-        //TODO: inject inventory
+        //TODO: inject inventory and pettyCash
         inventory = new Inventory();
+        pettyCash = new PettyCash();
+        insertedCoins = new LinkedList<Integer>();
     }
 
     public void attachView(MainActivityPresenter.View view){
@@ -56,71 +58,68 @@ public class MainActivityPresenter {
         if(coinValue == null){
             coinValue = EMPTY_STRING;
         }
-        int coin = getCoinValue(coinValue);
+
+        int coin = CoinsUtil.getCoinValue(coinValue);
         if(coin != -1){
-            insertedAmount += coin;
-            view.displayMessage(Integer.toString(insertedAmount));
+            insertedCoins.add(coin);
+            view.displayMessage(Integer.toString(CoinsUtil.getCoinsValue(insertedCoins)));
         } else{
             view.returnCoin(coinValue);
         }
     }
 
-    private int getCoinValue(String coinValue){
-        try {
-            Integer coin = Integer.valueOf(coinValue);
-            if(isValidCoin(coin)){
-                return coin;
-            }
-        } catch (NumberFormatException e){
-            Log.d(TAG, e.getMessage());
-        }
-        return -1;
-    }
-
-    private boolean isValidCoin(int coin){
-        for(int validCoin : Coins.validCoins){
-            if(coin == validCoin){
-                return true;
-            }
-        }
-        return false;
-    }
-
     public void dispatchProduct(Product product) {
-        int price = product.getPrice();
-
         if(inventory.getProductQuantity(product) == 0) {
             view.displayMessage(SOLD_OUT);
             displayInsertedAmount();
             return;
         }
 
-        if(insertedAmount >= price && inventory.getProductQuantity(product) > 0){
-            int change = insertedAmount - price;
-            insertedAmount = 0;
-            inventory.obtainProduct(product);
-            view.displayMessage(THANK_YOU_MSG);
-            view.setProductDispatched(product.getName());
-            view.displayDelayedMessage(INSERT_COIN_MSG);
-            view.returnCoin(Integer.toString(change));
+        int price = product.getPrice();
+
+        if(CoinsUtil.getCoinsValue(insertedCoins) >= price
+                && inventory.getProductQuantity(product) > 0){
+
+            int changeAmount = CoinsUtil.getCoinsValue(insertedCoins) - price;
+
+            pettyCash.addCoins(insertedCoins);
+
+            if(pettyCash.isChangeAvailable(changeAmount)){
+                pettyCash.getChange(changeAmount);
+                insertedCoins.clear();
+                inventory.obtainProduct(product);
+
+                view.displayMessage(THANK_YOU_MSG);
+                view.setProductDispatched(product.getName());
+                view.displayDelayedMessage(INSERT_COIN_MSG);
+                view.returnCoin(Integer.toString(changeAmount));
+            } else {
+                displayMessageAndDelayedAmount(EXACT_CHANGE_MSG);
+            }
         } else {
-            view.displayMessage(PRICE_MSG + product.getPrice());
-            displayInsertedAmount();
+            displayMessageAndDelayedAmount(PRICE_MSG + product.getPrice());
         }
     }
 
+
+    private void displayMessageAndDelayedAmount(String message){
+        view.displayMessage(message);
+        displayInsertedAmount();
+    }
+
     private void displayInsertedAmount(){
-        if(insertedAmount == 0){
+        if(CoinsUtil.getCoinsValue(insertedCoins) == 0){
             view.displayDelayedMessage(INSERT_COIN_MSG);
         } else {
-            view.displayDelayedMessage(Integer.toString(insertedAmount));
+            view.displayDelayedMessage(Integer.toString(CoinsUtil.getCoinsValue(insertedCoins)));
         }
     }
 
     public void getMoneyBack() {
-        view.returnCoin(Integer.toString(insertedAmount));
-        insertedAmount = 0;
+        view.returnCoin(Integer.toString(CoinsUtil.getCoinsValue(insertedCoins)));
+        insertedCoins.clear();
         view.displayMessage(INSERT_COIN_MSG);
     }
+
 
 }

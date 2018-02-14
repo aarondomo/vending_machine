@@ -26,6 +26,9 @@ public class MainActivity extends AppCompatActivity implements MainActivityPrese
 
     private MainActivityPresenter presenter;
 
+    private static final String COIN_RETURN = "Coin Return: ";
+    private static final String DISPATCHED_PRODUCT = "Dispatched product: ";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -95,12 +98,12 @@ public class MainActivity extends AppCompatActivity implements MainActivityPrese
     @Override
     public void returnCoin(String coinValue){
         //TODO: Extract string values
-        textViewCoinReturn.setText("Coin Return: " + coinValue);
+        textViewCoinReturn.setText(COIN_RETURN + coinValue);
     }
 
     @Override
     public void setProductDispatched(String productName){
-        textViewProductDispatch.setText("Dispatched product: " + productName);
+        textViewProductDispatch.setText(DISPATCHED_PRODUCT + productName);
     }
 
     private void getCoin(){

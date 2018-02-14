@@ -21,7 +21,6 @@ public class Inventory {
         warehouseMap.put(new Product("Candy", 65), 2);
     }
 
-    //TODO: Other scenarios as substract product will be handled in further stories
     public int getProductQuantity(Product product){
         return warehouseMap.get(product);
     }
@@ -33,8 +32,9 @@ public class Inventory {
     public int obtainProduct(Product product){
         int quantity = warehouseMap.get(product);
         if(quantity > 0){
-            warehouseMap.put(product, quantity - 1);
-            return quantity - 1;
+            quantity--;
+            warehouseMap.put(product, quantity);
+            return quantity;
         } else {
             warehouseMap.put(product, 0);
             return 0;

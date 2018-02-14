@@ -3,10 +3,12 @@ package com.aarondomo.vendingmachine;
 
 import android.util.Log;
 
+import com.aarondomo.vendingmachine.model.PettyCash;
 import com.aarondomo.vendingmachine.utils.Coins;
 import com.aarondomo.vendingmachine.model.Inventory;
 import com.aarondomo.vendingmachine.model.Product;
 
+import java.util.LinkedList;
 import java.util.List;
 
 public class MainActivityPresenter {
@@ -28,7 +30,8 @@ public class MainActivityPresenter {
     private View view;
     private int insertedAmount = 0;
     private Inventory inventory;
-
+    private PettyCash pettyCash;
+    private List<Integer> insertedCoins;
     private static final String TAG = MainActivityPresenter.class.getName();
 
     private static final String EMPTY_STRING = "";
@@ -37,10 +40,13 @@ public class MainActivityPresenter {
     private static final String INSERT_COIN_MSG = "INSERT_COIN";
     private static final String PRICE_MSG = "PRICE: ";
     private static final String SOLD_OUT = "SOLD OUT";
+    private static final String EXACT_CHANGE_MSG = "EXACT CHANGE ONLY" ;
 
     public MainActivityPresenter(){
-        //TODO: inject inventory
+        //TODO: inject inventory and pettyCash
         inventory = new Inventory();
+        pettyCash = new PettyCash();
+        insertedCoins = new LinkedList<Integer>();
     }
 
     public void attachView(MainActivityPresenter.View view){
@@ -59,6 +65,7 @@ public class MainActivityPresenter {
         int coin = getCoinValue(coinValue);
         if(coin != -1){
             insertedAmount += coin;
+            insertedCoins.add(coin);
             view.displayMessage(Integer.toString(insertedAmount));
         } else{
             view.returnCoin(coinValue);
@@ -95,14 +102,23 @@ public class MainActivityPresenter {
             return;
         }
 
+        int changeAmount = insertedAmount - price;
         if(insertedAmount >= price && inventory.getProductQuantity(product) > 0){
-            int change = insertedAmount - price;
-            insertedAmount = 0;
-            inventory.obtainProduct(product);
-            view.displayMessage(THANK_YOU_MSG);
-            view.setProductDispatched(product.getName());
-            view.displayDelayedMessage(INSERT_COIN_MSG);
-            view.returnCoin(Integer.toString(change));
+            pettyCash.addCoins(insertedCoins);
+            if(pettyCash.isChangeAvailable(changeAmount)){
+                insertedAmount = 0;
+                pettyCash.getChange(changeAmount);
+                insertedCoins.clear();
+                inventory.obtainProduct(product);
+                view.displayMessage(THANK_YOU_MSG);
+                view.setProductDispatched(product.getName());
+                view.displayDelayedMessage(INSERT_COIN_MSG);
+                view.returnCoin(Integer.toString(changeAmount));
+            } else {
+                view.displayMessage(EXACT_CHANGE_MSG);
+                displayInsertedAmount();
+            }
+
         } else {
             view.displayMessage(PRICE_MSG + product.getPrice());
             displayInsertedAmount();
@@ -120,7 +136,17 @@ public class MainActivityPresenter {
     public void getMoneyBack() {
         view.returnCoin(Integer.toString(insertedAmount));
         insertedAmount = 0;
+        insertedCoins.clear();
         view.displayMessage(INSERT_COIN_MSG);
     }
+
+    private int getInsertedAmount(List<Integer> coins){
+        int amount = 0;
+        for(int coin : coins){
+            amount += coin;
+        }
+        return amount;
+    }
+
 
 }

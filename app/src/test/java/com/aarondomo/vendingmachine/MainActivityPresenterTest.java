@@ -106,6 +106,27 @@ public class MainActivityPresenterTest {
     }
 
     @Test
+    public void dispatchProduct_should_display_thank_you_and_product_dispatched_and_return_change_and_delayed_insert_coin_when_inserted_amoun_greater_than_price() throws Exception {
+
+        String coinValue = "25";
+        Product product = new Product("Coke", 100);
+
+        subject.receiveCoin(coinValue);
+        subject.receiveCoin(coinValue);
+        subject.receiveCoin(coinValue);
+        subject.receiveCoin(coinValue);
+        subject.receiveCoin(coinValue);
+
+        subject.dispatchProduct(product);
+
+        verify(mockView).displayMessage(THANK_YOU_MSG);
+        verify(mockView).setProductDispatched(product.getName());
+        verify(mockView).displayDelayedMessage(INSERT_COIN_MSG);
+        verify(mockView).returnCoin("25");
+
+    }
+
+    @Test
     public void dispatchProduct_should_display_price_and_delayed_inserted_amount_when_inserted_amount_less_than_price() throws Exception {
 
         String coinValue = "25";

@@ -28,7 +28,6 @@ public class MainActivityPresenter {
     }
 
     private View view;
-    private int insertedAmount = 0;
     private Inventory inventory;
     private PettyCash pettyCash;
     private List<Integer> insertedCoins;
@@ -64,9 +63,8 @@ public class MainActivityPresenter {
         }
         int coin = getCoinValue(coinValue);
         if(coin != -1){
-            insertedAmount += coin;
             insertedCoins.add(coin);
-            view.displayMessage(Integer.toString(insertedAmount));
+            view.displayMessage(Integer.toString(getInsertedAmount(insertedCoins)));
         } else{
             view.returnCoin(coinValue);
         }
@@ -102,11 +100,12 @@ public class MainActivityPresenter {
             return;
         }
 
-        int changeAmount = insertedAmount - price;
-        if(insertedAmount >= price && inventory.getProductQuantity(product) > 0){
+        if(getInsertedAmount(insertedCoins) >= price && inventory.getProductQuantity(product) > 0){
+
+            int changeAmount = getInsertedAmount(insertedCoins) - price;
             pettyCash.addCoins(insertedCoins);
+
             if(pettyCash.isChangeAvailable(changeAmount)){
-                insertedAmount = 0;
                 pettyCash.getChange(changeAmount);
                 insertedCoins.clear();
                 inventory.obtainProduct(product);
@@ -126,16 +125,15 @@ public class MainActivityPresenter {
     }
 
     private void displayInsertedAmount(){
-        if(insertedAmount == 0){
+        if(getInsertedAmount(insertedCoins) == 0){
             view.displayDelayedMessage(INSERT_COIN_MSG);
         } else {
-            view.displayDelayedMessage(Integer.toString(insertedAmount));
+            view.displayDelayedMessage(Integer.toString(getInsertedAmount(insertedCoins)));
         }
     }
 
     public void getMoneyBack() {
-        view.returnCoin(Integer.toString(insertedAmount));
-        insertedAmount = 0;
+        view.returnCoin(Integer.toString(getInsertedAmount(insertedCoins)));
         insertedCoins.clear();
         view.displayMessage(INSERT_COIN_MSG);
     }

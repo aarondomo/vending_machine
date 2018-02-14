@@ -1,10 +1,7 @@
 package com.aarondomo.vendingmachine;
 
 
-import android.util.Log;
-
 import com.aarondomo.vendingmachine.model.PettyCash;
-import com.aarondomo.vendingmachine.utils.Coins;
 import com.aarondomo.vendingmachine.model.Inventory;
 import com.aarondomo.vendingmachine.model.Product;
 import com.aarondomo.vendingmachine.utils.CoinsUtil;
@@ -65,7 +62,7 @@ public class MainActivityPresenter {
         int coin = CoinsUtil.getCoinValue(coinValue);
         if(coin != -1){
             insertedCoins.add(coin);
-            view.displayMessage(Integer.toString(CoinsUtil.getInsertedAmount(insertedCoins)));
+            view.displayMessage(Integer.toString(CoinsUtil.getCoinsValue(insertedCoins)));
         } else{
             view.returnCoin(coinValue);
         }
@@ -80,10 +77,10 @@ public class MainActivityPresenter {
 
         int price = product.getPrice();
 
-        if(CoinsUtil.getInsertedAmount(insertedCoins) >= price
+        if(CoinsUtil.getCoinsValue(insertedCoins) >= price
                 && inventory.getProductQuantity(product) > 0){
 
-            int changeAmount = CoinsUtil.getInsertedAmount(insertedCoins) - price;
+            int changeAmount = CoinsUtil.getCoinsValue(insertedCoins) - price;
 
             pettyCash.addCoins(insertedCoins);
 
@@ -111,15 +108,15 @@ public class MainActivityPresenter {
     }
 
     private void displayInsertedAmount(){
-        if(CoinsUtil.getInsertedAmount(insertedCoins) == 0){
+        if(CoinsUtil.getCoinsValue(insertedCoins) == 0){
             view.displayDelayedMessage(INSERT_COIN_MSG);
         } else {
-            view.displayDelayedMessage(Integer.toString(CoinsUtil.getInsertedAmount(insertedCoins)));
+            view.displayDelayedMessage(Integer.toString(CoinsUtil.getCoinsValue(insertedCoins)));
         }
     }
 
     public void getMoneyBack() {
-        view.returnCoin(Integer.toString(CoinsUtil.getInsertedAmount(insertedCoins)));
+        view.returnCoin(Integer.toString(CoinsUtil.getCoinsValue(insertedCoins)));
         insertedCoins.clear();
         view.displayMessage(INSERT_COIN_MSG);
     }

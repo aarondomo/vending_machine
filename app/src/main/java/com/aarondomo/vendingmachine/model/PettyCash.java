@@ -1,6 +1,7 @@
 package com.aarondomo.vendingmachine.model;
 
 import com.aarondomo.vendingmachine.utils.Coins;
+import com.aarondomo.vendingmachine.utils.CoinsUtil;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -46,29 +47,27 @@ public class PettyCash {
         }
     }
 
-    public List<Integer> getChange(int amount){
-        List<Integer> change = new LinkedList<Integer>();
+    public void substractCoins(List<Integer> coins){
+        for(int coin : coins){
+            substractCoin(coin);
+        }
+    }
 
-        for(int i = 0; i < getCoinQuantity(Coins.TWENTY_FIVE_CENTS) && amount >= Coins.TWENTY_FIVE_CENTS; i++){
-            change.add(Coins.TWENTY_FIVE_CENTS);
-            substractCoin(Coins.TWENTY_FIVE_CENTS);
-            amount -= Coins.TWENTY_FIVE_CENTS;
-        }
-        for(int i = 0; i < getCoinQuantity(Coins.TEN_CENTS) && amount >= Coins.TEN_CENTS; i++){
-            change.add(Coins.TEN_CENTS);
-            substractCoin(Coins.TEN_CENTS);
-            amount -= Coins.TEN_CENTS;
-        }
-        for(int i = 0; i < getCoinQuantity(Coins.FIVE_CENTS) && amount >= Coins.FIVE_CENTS; i++){
-            change.add(Coins.FIVE_CENTS);
-            substractCoin(Coins.FIVE_CENTS);
-            amount -= Coins.FIVE_CENTS;
-        }
+    public List<Integer> getChange(int amount){
+        List<Integer> change = getChangeCoins(amount);
+
+        substractCoins(change);
 
         return change;
     }
 
     public boolean isChangeAvailable(int amount){
+        List<Integer> change = getChangeCoins(amount);
+
+        return CoinsUtil.getCoinsValue(change) == amount;
+    }
+
+    private List<Integer> getChangeCoins(int amount){
         List<Integer> change = new LinkedList<Integer>();
 
         for(int i = 0; i < getCoinQuantity(Coins.TWENTY_FIVE_CENTS) && amount >= Coins.TWENTY_FIVE_CENTS; i++){
@@ -83,7 +82,6 @@ public class PettyCash {
             change.add(Coins.FIVE_CENTS);
             amount -= Coins.FIVE_CENTS;
         }
-
-        return amount == 0;
+        return change;
     }
 }

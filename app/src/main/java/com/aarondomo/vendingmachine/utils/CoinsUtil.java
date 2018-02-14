@@ -29,7 +29,7 @@ public class CoinsUtil {
         return false;
     }
 
-    public static int getInsertedAmount(List<Integer> coins){
+    public static int getCoinsValue(List<Integer> coins){
         int amount = 0;
         for(int coin : coins){
             amount += coin;

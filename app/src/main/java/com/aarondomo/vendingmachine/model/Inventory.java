@@ -1,4 +1,4 @@
-package com.aarondomo.vendingmachine.utils;
+package com.aarondomo.vendingmachine.model;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -7,6 +7,7 @@ import java.util.Map;
 
 public class Inventory {
 
+    //The Integer value reflects the quantity available of a products available in the vending machine
     private Map<Product, Integer> warehouseMap;
 
     public Inventory() {
@@ -29,4 +30,14 @@ public class Inventory {
         return new ArrayList<Product>(warehouseMap.keySet());
     }
 
+    public int obtainProduct(Product product){
+        int quantity = warehouseMap.get(product);
+        if(quantity > 0){
+            warehouseMap.put(product, quantity - 1);
+            return quantity - 1;
+        } else {
+            warehouseMap.put(product, 0);
+            return 0;
+        }
+    }
 }

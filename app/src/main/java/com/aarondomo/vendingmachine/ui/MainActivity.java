@@ -10,7 +10,7 @@ import android.widget.TextView;
 
 import com.aarondomo.vendingmachine.MainActivityPresenter;
 import com.aarondomo.vendingmachine.R;
-import com.aarondomo.vendingmachine.utils.Product;
+import com.aarondomo.vendingmachine.model.Product;
 
 import java.util.List;
 

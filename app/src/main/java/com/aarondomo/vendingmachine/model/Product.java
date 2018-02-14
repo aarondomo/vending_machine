@@ -1,4 +1,4 @@
-package com.aarondomo.vendingmachine.utils;
+package com.aarondomo.vendingmachine.model;
 
 public class Product {
 

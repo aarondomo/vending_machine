@@ -1,6 +1,6 @@
 package com.aarondomo.vendingmachine;
 
-import com.aarondomo.vendingmachine.utils.Product;
+import com.aarondomo.vendingmachine.model.Product;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -19,6 +19,7 @@ public class MainActivityPresenterTest {
     private static final String THANK_YOU_MSG = "THANK YOU";
     private static final String INSERT_COIN_MSG = "INSERT_COIN";
     private static final String PRICE_MSG = "PRICE: ";
+    private static final String SOLD_OUT = "SOLD OUT";
 
     @Mock
     MainActivityPresenter.View mockView;
@@ -158,6 +159,32 @@ public class MainActivityPresenterTest {
     }
 
     @Test
+    public void dispatchProduct_should_display_sold_out_and_delayed_insert_coin_when_product_quantity_is_zero_and_inserted_amount_is_zero() throws Exception {
+
+        Product product = new Product("Coke", 100);
+
+        subject.dispatchProduct(product);
+
+        verify(mockView).displayMessage(SOLD_OUT);
+        verify(mockView).displayDelayedMessage(INSERT_COIN_MSG);
+
+    }
+
+    @Test
+    public void dispatchProduct_should_display_sold_out_and_delayed_insert_amount_when_product_quantity_is_zero_and_inserted_amount_is_not_zero() throws Exception {
+
+        String coinValue = "25";
+        Product product = new Product("Coke", 100);
+        subject.receiveCoin(coinValue);
+
+        subject.dispatchProduct(product);
+
+        verify(mockView).displayMessage(SOLD_OUT);
+        verify(mockView).displayDelayedMessage(coinValue);
+
+    }
+
+    @Test
     public void getMoneyBack_should_return_coin_and_display_insert_coin() throws Exception {
 
         String coinValue = "25";
@@ -170,5 +197,9 @@ public class MainActivityPresenterTest {
         verify(mockView).displayDelayedMessage(INSERT_COIN_MSG);
 
     }
+
+
+
+
 
 }

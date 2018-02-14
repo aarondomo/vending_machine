@@ -4,8 +4,8 @@ package com.aarondomo.vendingmachine;
 import android.util.Log;
 
 import com.aarondomo.vendingmachine.utils.Coins;
-import com.aarondomo.vendingmachine.utils.Inventory;
-import com.aarondomo.vendingmachine.utils.Product;
+import com.aarondomo.vendingmachine.model.Inventory;
+import com.aarondomo.vendingmachine.model.Product;
 
 import java.util.List;
 
@@ -36,6 +36,7 @@ public class MainActivityPresenter {
     private static final String THANK_YOU_MSG = "THANK YOU";
     private static final String INSERT_COIN_MSG = "INSERT_COIN";
     private static final String PRICE_MSG = "PRICE: ";
+    private static final String SOLD_OUT = "SOLD OUT";
 
     public MainActivityPresenter(){
         //TODO: inject inventory
@@ -87,24 +88,34 @@ public class MainActivityPresenter {
 
     public void dispatchProduct(Product product) {
         int price = product.getPrice();
-        if(insertedAmount >= price){
+
+        if(inventory.getProductQuantity(product) == 0) {
+            view.displayMessage(SOLD_OUT);
+            displayInsertedAmount();
+            return;
+        }
+
+        if(insertedAmount >= price && inventory.getProductQuantity(product) > 0){
             int change = insertedAmount - price;
             insertedAmount = 0;
+            inventory.obtainProduct(product);
             view.displayMessage(THANK_YOU_MSG);
             view.setProductDispatched(product.getName());
             view.displayDelayedMessage(INSERT_COIN_MSG);
             view.returnCoin(Integer.toString(change));
         } else {
             view.displayMessage(PRICE_MSG + product.getPrice());
-            if(insertedAmount == 0){
-                view.displayDelayedMessage(INSERT_COIN_MSG);
-            } else {
-                view.displayDelayedMessage(Integer.toString(insertedAmount));
-            }
+            displayInsertedAmount();
         }
-
     }
 
+    private void displayInsertedAmount(){
+        if(insertedAmount == 0){
+            view.displayDelayedMessage(INSERT_COIN_MSG);
+        } else {
+            view.displayDelayedMessage(Integer.toString(insertedAmount));
+        }
+    }
 
     public void getMoneyBack() {
         view.returnCoin(Integer.toString(insertedAmount));

@@ -1,6 +1,5 @@
 package com.aarondomo.vendingmachine.model;
 
-import com.aarondomo.vendingmachine.utils.Coins;
 import com.aarondomo.vendingmachine.utils.CoinsUtil;
 
 import java.util.HashMap;
@@ -24,6 +23,7 @@ public class PettyCash {
         cashMap.put(Coins.TWENTY_FIVE_CENTS, 0);
     }
 
+    //TODO:Add test cases
     public int getCoinQuantity(int coin){
         return cashMap.get(coin);
     }

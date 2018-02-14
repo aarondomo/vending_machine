@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.aarondomo.vendingmachine.ui.MainActivity">
+    tools:context="com.aarondomo.vendingmachine.ui.VendingMachineActivity">
 
 
 
@@ -26,6 +26,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/insert_coin"
+            android:textSize="@dimen/textSize_medium"
             android:id="@+id/textView_main_display"/>
 
         <EditText
@@ -49,11 +50,13 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textSize="@dimen/textSize_medium"
             android:id="@+id/textView_main_coinReturn"/>
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textSize="@dimen/textSize_medium"
             android:id="@+id/textView_main_productDispatch"/>
 
     </LinearLayout>

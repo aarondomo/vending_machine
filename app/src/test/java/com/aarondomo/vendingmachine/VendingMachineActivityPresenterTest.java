@@ -1,19 +1,25 @@
 package com.aarondomo.vendingmachine;
 
+import com.aarondomo.vendingmachine.model.Inventory;
+import com.aarondomo.vendingmachine.model.PettyCash;
 import com.aarondomo.vendingmachine.model.Product;
+import com.aarondomo.vendingmachine.presenters.VendingMachineActivityPresenter;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.robolectric.RobolectricTestRunner;
 
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-@RunWith(RobolectricTestRunner.class)
-public class MainActivityPresenterTest {
+
+@RunWith(MockitoJUnitRunner.class)
+public class VendingMachineActivityPresenterTest {
 
     private static final String EMPTY_STRING = "";
     private static final String THANK_YOU_MSG = "THANK YOU";
@@ -22,9 +28,15 @@ public class MainActivityPresenterTest {
     private static final String SOLD_OUT = "SOLD OUT";
 
     @Mock
-    MainActivityPresenter.View mockView;
+    VendingMachineActivityPresenter.View mockView;
 
-    MainActivityPresenter subject;
+    @Mock
+    Inventory mockInventory;
+
+    @Mock
+    PettyCash mockPettyCash;
+
+    VendingMachineActivityPresenter subject;
 
 
     @Before
@@ -32,7 +44,7 @@ public class MainActivityPresenterTest {
 
         MockitoAnnotations.initMocks(this);
 
-        subject = new MainActivityPresenter();
+        subject = new VendingMachineActivityPresenter(mockInventory, mockPettyCash);
 
         subject.attachView(mockView);
 
@@ -91,6 +103,9 @@ public class MainActivityPresenterTest {
 
         String coinValue = "25";
         Product product = new Product("Coke", 100);
+        when(mockInventory.getProductQuantity(product)).thenReturn(1);
+        when(mockPettyCash.isChangeAvailable(0)).thenReturn(true);
+
 
         subject.receiveCoin(coinValue);
         subject.receiveCoin(coinValue);
@@ -110,6 +125,8 @@ public class MainActivityPresenterTest {
 
         String coinValue = "25";
         Product product = new Product("Coke", 100);
+        when(mockInventory.getProductQuantity(product)).thenReturn(1);
+        when(mockPettyCash.isChangeAvailable(25)).thenReturn(true);
 
         subject.receiveCoin(coinValue);
         subject.receiveCoin(coinValue);
@@ -131,13 +148,14 @@ public class MainActivityPresenterTest {
 
         String coinValue = "25";
         Product product = new Product("Coke", 100);
+        when(mockInventory.getProductQuantity(product)).thenReturn(1);
 
         subject.receiveCoin(coinValue);
         subject.receiveCoin(coinValue);
 
         subject.dispatchProduct(product);
 
-        verify(mockView).displayMessage(PRICE_MSG + PRICE_MSG + product.getPrice());
+        verify(mockView).displayMessage(PRICE_MSG + product.getPrice());
         verify(mockView).displayDelayedMessage("50");
 
     }
@@ -145,15 +163,12 @@ public class MainActivityPresenterTest {
     @Test
     public void dispatchProduct_should_display_price_and_delayed_insert_coin_when_inserted_amount_is_zero() throws Exception {
 
-        String coinValue = "25";
         Product product = new Product("Coke", 100);
-
-        subject.receiveCoin(coinValue);
-        subject.receiveCoin(coinValue);
+        when(mockInventory.getProductQuantity(product)).thenReturn(1);
 
         subject.dispatchProduct(product);
 
-        verify(mockView).displayMessage(PRICE_MSG + PRICE_MSG + product.getPrice());
+        verify(mockView).displayMessage(PRICE_MSG + product.getPrice());
         verify(mockView).displayDelayedMessage(INSERT_COIN_MSG);
 
     }
@@ -162,6 +177,7 @@ public class MainActivityPresenterTest {
     public void dispatchProduct_should_display_sold_out_and_delayed_insert_coin_when_product_quantity_is_zero_and_inserted_amount_is_zero() throws Exception {
 
         Product product = new Product("Coke", 100);
+        when(mockInventory.getProductQuantity(product)).thenReturn(0);
 
         subject.dispatchProduct(product);
 
@@ -175,6 +191,7 @@ public class MainActivityPresenterTest {
 
         String coinValue = "25";
         Product product = new Product("Coke", 100);
+        when(mockInventory.getProductQuantity(product)).thenReturn(0);
         subject.receiveCoin(coinValue);
 
         subject.dispatchProduct(product);
@@ -194,7 +211,7 @@ public class MainActivityPresenterTest {
         subject.getMoneyBack();
 
         verify(mockView).returnCoin(coinValue);
-        verify(mockView).displayDelayedMessage(INSERT_COIN_MSG);
+        verify(mockView).displayMessage(INSERT_COIN_MSG);
 
     }
 

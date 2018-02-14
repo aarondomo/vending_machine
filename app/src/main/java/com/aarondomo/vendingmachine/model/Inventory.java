@@ -21,6 +21,7 @@ public class Inventory {
         warehouseMap.put(new Product("Candy", 65), 2);
     }
 
+    //TODO: Add test cases
     public int getProductQuantity(Product product){
         return warehouseMap.get(product);
     }

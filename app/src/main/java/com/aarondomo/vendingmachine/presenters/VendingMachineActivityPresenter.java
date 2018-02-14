@@ -1,4 +1,4 @@
-package com.aarondomo.vendingmachine;
+package com.aarondomo.vendingmachine.presenters;
 
 
 import com.aarondomo.vendingmachine.model.PettyCash;
@@ -9,7 +9,7 @@ import com.aarondomo.vendingmachine.utils.CoinsUtil;
 import java.util.LinkedList;
 import java.util.List;
 
-public class MainActivityPresenter {
+public class VendingMachineActivityPresenter {
 
     public interface View {
 
@@ -31,21 +31,20 @@ public class MainActivityPresenter {
     private List<Integer> insertedCoins;
 
     private static final String EMPTY_STRING = "";
-
     private static final String THANK_YOU_MSG = "THANK YOU";
     private static final String INSERT_COIN_MSG = "INSERT_COIN";
     private static final String PRICE_MSG = "PRICE: ";
     private static final String SOLD_OUT = "SOLD OUT";
     private static final String EXACT_CHANGE_MSG = "EXACT CHANGE ONLY" ;
 
-    public MainActivityPresenter(){
-        //TODO: inject inventory and pettyCash
-        inventory = new Inventory();
-        pettyCash = new PettyCash();
+    public VendingMachineActivityPresenter(Inventory inventory,
+                                           PettyCash pettyCash){
+        this.inventory = inventory;
+        this.pettyCash = pettyCash;
         insertedCoins = new LinkedList<Integer>();
     }
 
-    public void attachView(MainActivityPresenter.View view){
+    public void attachView(VendingMachineActivityPresenter.View view){
         this.view = view;
         view.displayProducts(inventory.getProducts());
     }
@@ -59,7 +58,7 @@ public class MainActivityPresenter {
             coinValue = EMPTY_STRING;
         }
 
-        int coin = CoinsUtil.getCoinValue(coinValue);
+        int coin = CoinsUtil.getValidCoinValue(coinValue);
         if(coin != -1){
             insertedCoins.add(coin);
             view.displayMessage(Integer.toString(CoinsUtil.getCoinsValue(insertedCoins)));

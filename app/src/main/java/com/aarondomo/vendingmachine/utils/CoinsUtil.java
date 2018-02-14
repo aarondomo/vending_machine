@@ -1,21 +1,19 @@
 package com.aarondomo.vendingmachine.utils;
 
-import android.util.Log;
+import com.aarondomo.vendingmachine.model.Coins;
 
 import java.util.List;
 
 public class CoinsUtil {
 
-    private static final String TAG = CoinsUtil.class.getName();
-
-    public static int getCoinValue(String coinValue){
+    public static int getValidCoinValue(String coinValue){
         try {
             Integer coin = Integer.valueOf(coinValue);
             if(isValidCoin(coin)){
                 return coin;
             }
         } catch (NumberFormatException e){
-            Log.d(TAG, e.getMessage());
+
         }
         return -1;
     }
@@ -32,7 +30,9 @@ public class CoinsUtil {
     public static int getCoinsValue(List<Integer> coins){
         int amount = 0;
         for(int coin : coins){
-            amount += coin;
+            if(isValidCoin(coin)){
+                amount += coin;
+            }
         }
         return amount;
     }

@@ -2,19 +2,25 @@ package com.aarondomo.vendingmachine.ui;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.InputType;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.aarondomo.vendingmachine.MainActivityPresenter;
+import com.aarondomo.vendingmachine.di.DaggerVendingMachineComponent;
+import com.aarondomo.vendingmachine.di.VendingMachineModule;
+import com.aarondomo.vendingmachine.presenters.VendingMachineActivityPresenter;
 import com.aarondomo.vendingmachine.R;
 import com.aarondomo.vendingmachine.model.Product;
 
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements MainActivityPresenter.View{
+import javax.inject.Inject;
+
+public class VendingMachineActivity extends AppCompatActivity implements VendingMachineActivityPresenter.View{
 
     private LinearLayout linearLayoutProductDisplay;
     private TextView textViewDisplay;
@@ -24,10 +30,14 @@ public class MainActivity extends AppCompatActivity implements MainActivityPrese
     private TextView textViewCoinReturn;
     private TextView textViewProductDispatch;
 
-    private MainActivityPresenter presenter;
+    @Inject
+    VendingMachineActivityPresenter presenter;
+
+    private InputMethodManager inputMethodManager;
 
     private static final String COIN_RETURN = "Coin Return: ";
     private static final String DISPATCHED_PRODUCT = "Dispatched product: ";
+    private static final int DELAY_TIME = 1000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,16 +47,28 @@ public class MainActivity extends AppCompatActivity implements MainActivityPrese
         bindViews();
         setUpButtonInsertCoinOnClickListener();
         setUpButtonMoneyBackOnClickListener();
+        setUpInputManager();
 
-        //TODO: inject the presenter with Dagger2
-        presenter = new MainActivityPresenter();
+        setUpDaggerComponent();
 
         presenter.attachView(this);
 
     }
 
+    private void setUpDaggerComponent() {
+        DaggerVendingMachineComponent.builder()
+                .vendingMachineModule(new VendingMachineModule(this))
+                .build()
+                .inject(this);
+    }
+
+    private void setUpInputManager(){
+        inputMethodManager =
+                (InputMethodManager)getSystemService(getApplicationContext()
+                        .INPUT_METHOD_SERVICE);
+    }
+
     private void bindViews(){
-        //TODO: bind using Butterknife
         linearLayoutProductDisplay = (LinearLayout)findViewById(R.id.linearLayout_main_productDisplay);
         textViewDisplay = (TextView) findViewById(R.id.textView_main_display);
         editTextCoinSlot = (EditText) findViewById(R.id.editText_main_coinSlot);
@@ -62,6 +84,9 @@ public class MainActivity extends AppCompatActivity implements MainActivityPrese
             public void onClick(View view) {
                 getCoin();
                 editTextCoinSlot.setText("");
+                //Hide the keyboard after click insert button
+                inputMethodManager
+                        .hideSoftInputFromWindow(editTextCoinSlot.getWindowToken(), 0);
             }
         });
     }
@@ -92,12 +117,11 @@ public class MainActivity extends AppCompatActivity implements MainActivityPrese
             public void run() {
                 textViewDisplay.setText(message);
             }
-        }, 1000);
+        }, DELAY_TIME);
     }
 
     @Override
     public void returnCoin(String coinValue){
-        //TODO: Extract string values
         textViewCoinReturn.setText(COIN_RETURN + coinValue);
     }
 

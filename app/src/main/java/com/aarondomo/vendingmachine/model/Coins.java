@@ -1,7 +1,4 @@
-package com.aarondomo.vendingmachine.utils;
-
-import java.util.HashSet;
-import java.util.Set;
+package com.aarondomo.vendingmachine.model;
 
 public abstract class Coins {
     public static final int ONE_CENT = 1;

@@ -25,6 +25,10 @@ dependencies {
 
     testImplementation 'junit:junit:4.12'
 
+    //Dagger2
+    implementation 'com.google.dagger:dagger:2.11'
+    annotationProcessor 'com.google.dagger:dagger-compiler:2.11'
+
     //Mockito
     testImplementation "org.mockito:mockito-core:2.+"
     //Roboelectric

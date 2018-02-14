@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">VendingMachine</string>
+    <string name="insert_coin">INSERT COIN</string>
 </resources>

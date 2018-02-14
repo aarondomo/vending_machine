@@ -4,6 +4,10 @@ package com.aarondomo.vendingmachine;
 import android.util.Log;
 
 import com.aarondomo.vendingmachine.utils.Coins;
+import com.aarondomo.vendingmachine.utils.Inventory;
+import com.aarondomo.vendingmachine.utils.Product;
+
+import java.util.List;
 
 public class MainActivityPresenter {
 
@@ -13,17 +17,34 @@ public class MainActivityPresenter {
 
         void returnCoin(String coinValue);
 
+        void setProductDispatched(String productName);
+
+        void displayDelayedMessage(String message);
+
+        void displayProducts(List<Product> products);
+
     }
 
     private View view;
-
     private int insertedAmount = 0;
+    private Inventory inventory;
 
     private static final String TAG = MainActivityPresenter.class.getName();
+
     private static final String EMPTY_STRING = "";
+
+    private static final String THANK_YOU_MSG = "THANK YOU";
+    private static final String INSERT_COIN_MSG = "INSERT_COIN";
+    private static final String PRICE_MSG = "PRICE: ";
+
+    public MainActivityPresenter(){
+        //TODO: inject inventory
+        inventory = new Inventory();
+    }
 
     public void attachView(MainActivityPresenter.View view){
         this.view = view;
+        view.displayProducts(inventory.getProducts());
     }
 
     public void dettachView(){
@@ -62,6 +83,24 @@ public class MainActivityPresenter {
             }
         }
         return false;
+    }
+
+    public void dispatchProduct(Product product) {
+        int price = product.getPrice();
+        if(insertedAmount >= price){
+            insertedAmount = insertedAmount - price;
+            view.displayMessage(THANK_YOU_MSG);
+            view.setProductDispatched(product.getName());
+            view.displayDelayedMessage(INSERT_COIN_MSG);
+        } else {
+            view.displayMessage(PRICE_MSG + product.getPrice());
+            if(insertedAmount == 0){
+                view.displayDelayedMessage(INSERT_COIN_MSG);
+            } else {
+                view.displayDelayedMessage(Integer.toString(insertedAmount));
+            }
+        }
+
     }
 
 

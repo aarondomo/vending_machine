@@ -7,6 +7,7 @@ import com.aarondomo.vendingmachine.model.PettyCash;
 import com.aarondomo.vendingmachine.utils.Coins;
 import com.aarondomo.vendingmachine.model.Inventory;
 import com.aarondomo.vendingmachine.model.Product;
+import com.aarondomo.vendingmachine.utils.CoinsUtil;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -31,7 +32,6 @@ public class MainActivityPresenter {
     private Inventory inventory;
     private PettyCash pettyCash;
     private List<Integer> insertedCoins;
-    private static final String TAG = MainActivityPresenter.class.getName();
 
     private static final String EMPTY_STRING = "";
 
@@ -61,89 +61,67 @@ public class MainActivityPresenter {
         if(coinValue == null){
             coinValue = EMPTY_STRING;
         }
-        int coin = getCoinValue(coinValue);
+
+        int coin = CoinsUtil.getCoinValue(coinValue);
         if(coin != -1){
             insertedCoins.add(coin);
-            view.displayMessage(Integer.toString(getInsertedAmount(insertedCoins)));
+            view.displayMessage(Integer.toString(CoinsUtil.getInsertedAmount(insertedCoins)));
         } else{
             view.returnCoin(coinValue);
         }
     }
 
-    private int getCoinValue(String coinValue){
-        try {
-            Integer coin = Integer.valueOf(coinValue);
-            if(isValidCoin(coin)){
-                return coin;
-            }
-        } catch (NumberFormatException e){
-            Log.d(TAG, e.getMessage());
-        }
-        return -1;
-    }
-
-    private boolean isValidCoin(int coin){
-        for(int validCoin : Coins.validCoins){
-            if(coin == validCoin){
-                return true;
-            }
-        }
-        return false;
-    }
-
     public void dispatchProduct(Product product) {
-        int price = product.getPrice();
-
         if(inventory.getProductQuantity(product) == 0) {
             view.displayMessage(SOLD_OUT);
             displayInsertedAmount();
             return;
         }
 
-        if(getInsertedAmount(insertedCoins) >= price && inventory.getProductQuantity(product) > 0){
+        int price = product.getPrice();
 
-            int changeAmount = getInsertedAmount(insertedCoins) - price;
+        if(CoinsUtil.getInsertedAmount(insertedCoins) >= price
+                && inventory.getProductQuantity(product) > 0){
+
+            int changeAmount = CoinsUtil.getInsertedAmount(insertedCoins) - price;
+
             pettyCash.addCoins(insertedCoins);
 
             if(pettyCash.isChangeAvailable(changeAmount)){
                 pettyCash.getChange(changeAmount);
                 insertedCoins.clear();
                 inventory.obtainProduct(product);
+
                 view.displayMessage(THANK_YOU_MSG);
                 view.setProductDispatched(product.getName());
                 view.displayDelayedMessage(INSERT_COIN_MSG);
                 view.returnCoin(Integer.toString(changeAmount));
             } else {
-                view.displayMessage(EXACT_CHANGE_MSG);
-                displayInsertedAmount();
+                displayMessageAndDelayedAmount(EXACT_CHANGE_MSG);
             }
-
         } else {
-            view.displayMessage(PRICE_MSG + product.getPrice());
-            displayInsertedAmount();
+            displayMessageAndDelayedAmount(PRICE_MSG + product.getPrice());
         }
     }
 
+
+    private void displayMessageAndDelayedAmount(String message){
+        view.displayMessage(message);
+        displayInsertedAmount();
+    }
+
     private void displayInsertedAmount(){
-        if(getInsertedAmount(insertedCoins) == 0){
+        if(CoinsUtil.getInsertedAmount(insertedCoins) == 0){
             view.displayDelayedMessage(INSERT_COIN_MSG);
         } else {
-            view.displayDelayedMessage(Integer.toString(getInsertedAmount(insertedCoins)));
+            view.displayDelayedMessage(Integer.toString(CoinsUtil.getInsertedAmount(insertedCoins)));
         }
     }
 
     public void getMoneyBack() {
-        view.returnCoin(Integer.toString(getInsertedAmount(insertedCoins)));
+        view.returnCoin(Integer.toString(CoinsUtil.getInsertedAmount(insertedCoins)));
         insertedCoins.clear();
         view.displayMessage(INSERT_COIN_MSG);
-    }
-
-    private int getInsertedAmount(List<Integer> coins){
-        int amount = 0;
-        for(int coin : coins){
-            amount += coin;
-        }
-        return amount;
     }
 
 

@@ -1,13 +1,18 @@
 package com.aarondomo.vendingmachine.ui;
 
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.InputType;
+import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
+import android.widget.ImageButton;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 
 import com.aarondomo.vendingmachine.di.DaggerVendingMachineComponent;
@@ -22,32 +27,33 @@ import javax.inject.Inject;
 
 public class VendingMachineActivity extends AppCompatActivity implements VendingMachineActivityPresenter.View{
 
-    private LinearLayout linearLayoutProductDisplay;
+    private TableLayout tableLayoutProductDisplay;
     private TextView textViewDisplay;
     private EditText editTextCoinSlot;
     private Button buttonInsertCoin;
     private Button buttonMoneyBack;
     private TextView textViewCoinReturn;
     private TextView textViewProductDispatch;
+    private DisplayMetrics displayMetrics;
 
     @Inject
     VendingMachineActivityPresenter presenter;
 
-    private InputMethodManager inputMethodManager;
-
     private static final String COIN_RETURN = "Coin Return: ";
     private static final String DISPATCHED_PRODUCT = "Dispatched product: ";
     private static final int DELAY_TIME = 1000;
+    private static final int COLUMN_NUMBER = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        setUpDisplayMetrics();
+
         bindViews();
         setUpButtonInsertCoinOnClickListener();
         setUpButtonMoneyBackOnClickListener();
-        setUpInputManager();
 
         setUpDaggerComponent();
 
@@ -62,14 +68,9 @@ public class VendingMachineActivity extends AppCompatActivity implements Vending
                 .inject(this);
     }
 
-    private void setUpInputManager(){
-        inputMethodManager =
-                (InputMethodManager)getSystemService(getApplicationContext()
-                        .INPUT_METHOD_SERVICE);
-    }
 
     private void bindViews(){
-        linearLayoutProductDisplay = (LinearLayout)findViewById(R.id.linearLayout_main_productDisplay);
+        tableLayoutProductDisplay = (TableLayout) findViewById(R.id.tableLayout_main_productDisplay);
         textViewDisplay = (TextView) findViewById(R.id.textView_main_display);
         editTextCoinSlot = (EditText) findViewById(R.id.editText_main_coinSlot);
         buttonInsertCoin = (Button) findViewById(R.id.button_main_insertCoin);
@@ -84,9 +85,6 @@ public class VendingMachineActivity extends AppCompatActivity implements Vending
             public void onClick(View view) {
                 getCoin();
                 editTextCoinSlot.setText("");
-                //Hide the keyboard after click insert button
-                inputMethodManager
-                        .hideSoftInputFromWindow(editTextCoinSlot.getWindowToken(), 0);
             }
         });
     }
@@ -137,19 +135,27 @@ public class VendingMachineActivity extends AppCompatActivity implements Vending
 
     @Override
     public void displayProducts(List<Product> products){
+        TableRow tableRow = null;
+
+        int rowItems = 0;
+
         for(final Product product : products) {
-            linearLayoutProductDisplay.addView(setUpProductButton(product));
+            if(rowItems % COLUMN_NUMBER == 0){
+                tableRow = new TableRow(this);
+                tableRow.addView(setUpProductButton(product));
+                tableLayoutProductDisplay.addView(tableRow);
+            } else {
+                tableRow.addView(setUpProductButton(product));
+            }
+            rowItems++;
         }
+        tableLayoutProductDisplay.setStretchAllColumns(true);
     }
 
-    private Button setUpProductButton(final Product product){
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT);
+    private ImageButton setUpProductButton(final Product product){
 
-        Button productButton = new Button(this);
-        productButton.setText(product.getName());
-        productButton.setLayoutParams(params);
+        ImageButton productButton = new ImageButton(this);
+        productButton.setImageBitmap(resize(product.getPicture()));
 
         productButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -158,6 +164,23 @@ public class VendingMachineActivity extends AppCompatActivity implements Vending
             }
         });
         return productButton;
+    }
+
+    private void setUpDisplayMetrics(){
+        displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getRealMetrics(displayMetrics);
+    }
+
+    private Bitmap resize(int pictureResource) {
+        Drawable image = getResources().getDrawable(pictureResource);
+        Bitmap bitmap = ((BitmapDrawable)image).getBitmap();
+        int size = getImageWidth();
+        Bitmap bitmapResized = Bitmap.createScaledBitmap(bitmap, size, size, false);
+        return bitmapResized;
+    }
+
+    private int getImageWidth(){
+        return (displayMetrics.widthPixels / (COLUMN_NUMBER * 2));
     }
 
 }

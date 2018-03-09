@@ -1,5 +1,7 @@
 package com.aarondomo.vendingmachine.model;
 
+import com.aarondomo.vendingmachine.R;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,9 +18,10 @@ public class Inventory {
     }
 
     private void supplyInventory(){
-        warehouseMap.put(new Product("Cola", 100), 2);
-        warehouseMap.put(new Product("Chip", 50), 2);
-        warehouseMap.put(new Product("Candy", 65), 2);
+        warehouseMap.put(new Product("Cola", 100, R.drawable.cola_256), 2);
+        warehouseMap.put(new Product("Chip", 50, R.drawable.chips_256), 2);
+        warehouseMap.put(new Product("Candy", 65, R.drawable.candy_256), 2);
+        warehouseMap.put(new Product("Cookies", 80, R.drawable.cookie_256), 2);
     }
 
     //TODO: Add test cases

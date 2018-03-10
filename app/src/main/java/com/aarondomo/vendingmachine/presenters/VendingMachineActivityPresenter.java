@@ -17,11 +17,11 @@ public class VendingMachineActivityPresenter {
 
         void returnCoin(String coinValue);
 
-        void setProductDispatched(String productName);
-
         void displayDelayedMessage(String message);
 
         void displayProducts(List<Product> products);
+
+        void showDispatchedProductAlert(Product product);
 
     }
 
@@ -84,14 +84,14 @@ public class VendingMachineActivityPresenter {
             pettyCash.addCoins(insertedCoins);
 
             if(pettyCash.isChangeAvailable(changeAmount)){
-                pettyCash.getChange(changeAmount);
+                List<Integer> changeCoins = pettyCash.getChange(changeAmount);
                 insertedCoins.clear();
                 inventory.obtainProduct(product);
 
                 view.displayMessage(THANK_YOU_MSG);
-                view.setProductDispatched(product.getName());
+                view.showDispatchedProductAlert(product);
                 view.displayDelayedMessage(INSERT_COIN_MSG);
-                view.returnCoin(Integer.toString(changeAmount));
+                view.returnCoin(getReturnCoinMessage(changeCoins));
             } else {
                 displayMessageAndDelayedAmount(EXACT_CHANGE_MSG);
             }
@@ -114,8 +114,12 @@ public class VendingMachineActivityPresenter {
         }
     }
 
+    private String getReturnCoinMessage(List<Integer> coinList){
+        return "Total:" + CoinsUtil.getCoinsValue(coinList) + " " + CoinsUtil.getCoinMapString(coinList);
+    }
+
     public void getMoneyBack() {
-        view.returnCoin(Integer.toString(CoinsUtil.getCoinsValue(insertedCoins)));
+        view.returnCoin(getReturnCoinMessage(insertedCoins));
         insertedCoins.clear();
         view.displayMessage(INSERT_COIN_MSG);
     }

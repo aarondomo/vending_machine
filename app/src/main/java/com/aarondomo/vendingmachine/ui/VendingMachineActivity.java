@@ -3,6 +3,8 @@ package com.aarondomo.vendingmachine.ui;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Handler;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -11,6 +13,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -33,7 +36,6 @@ public class VendingMachineActivity extends AppCompatActivity implements Vending
     private Button buttonInsertCoin;
     private Button buttonMoneyBack;
     private TextView textViewCoinReturn;
-    private TextView textViewProductDispatch;
     private DisplayMetrics displayMetrics;
 
     @Inject
@@ -41,6 +43,9 @@ public class VendingMachineActivity extends AppCompatActivity implements Vending
 
     private static final String COIN_RETURN = "Coin Return: ";
     private static final String DISPATCHED_PRODUCT = "Dispatched product: ";
+    private static final String TAKE_PRODUCT = "Take Product";
+    private static final String ENJOY = "Enjoy!";
+    private static final String EMPTY_STRING = "";
     private static final int DELAY_TIME = 1000;
     private static final int COLUMN_NUMBER = 2;
 
@@ -76,7 +81,6 @@ public class VendingMachineActivity extends AppCompatActivity implements Vending
         buttonInsertCoin = (Button) findViewById(R.id.button_main_insertCoin);
         buttonMoneyBack = (Button) findViewById(R.id.button_main_moneyBack);
         textViewCoinReturn = (TextView) findViewById(R.id.textView_main_coinReturn);
-        textViewProductDispatch = (TextView) findViewById(R.id.textView_main_productDispatch);
     }
 
     private void setUpButtonInsertCoinOnClickListener(){
@@ -84,7 +88,8 @@ public class VendingMachineActivity extends AppCompatActivity implements Vending
             @Override
             public void onClick(View view) {
                 getCoin();
-                editTextCoinSlot.setText("");
+                editTextCoinSlot.setText(EMPTY_STRING);
+                hideSoftKeyboard();
             }
         });
     }
@@ -121,11 +126,6 @@ public class VendingMachineActivity extends AppCompatActivity implements Vending
     @Override
     public void returnCoin(String coinValue){
         textViewCoinReturn.setText(COIN_RETURN + coinValue);
-    }
-
-    @Override
-    public void setProductDispatched(String productName){
-        textViewProductDispatch.setText(DISPATCHED_PRODUCT + productName);
     }
 
     private void getCoin(){
@@ -181,6 +181,36 @@ public class VendingMachineActivity extends AppCompatActivity implements Vending
 
     private int getImageWidth(){
         return (displayMetrics.widthPixels / (COLUMN_NUMBER * 2));
+    }
+
+    @Override
+    public void showDispatchedProductAlert(Product product) {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        ImageView imageView = new ImageView(this);
+        imageView.setImageResource(product.getPicture());
+
+        builder.setTitle(DISPATCHED_PRODUCT + product.getName());
+        builder.setMessage(ENJOY);
+        builder.setView(imageView);
+
+        builder.setPositiveButton(TAKE_PRODUCT, null);
+
+        final AlertDialog dialog = builder.create();
+
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            public void run() {
+                dialog.show();
+            }
+        }, DELAY_TIME);
+    }
+
+    private void hideSoftKeyboard() {
+        InputMethodManager inputMethodManager =
+                (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
     }
 
 }

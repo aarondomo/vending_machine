@@ -9,10 +9,6 @@
 
 
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -34,39 +30,40 @@
                 android:textSize="@dimen/textSize_medium"
                 android:id="@+id/textView_main_display"/>
 
-            <EditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/editText_main_coinSlot"
-                android:inputType="number"/>
-
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/button_main_insertCoin"
-                android:text="Insert"/>
-
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/button_main_moneyBack"
-                android:text="@string/money_back"/>
-
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="@dimen/textSize_medium"
                 android:id="@+id/textView_main_coinReturn"/>
 
-            <TextView
-                android:layout_width="match_parent"
+            <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+                <EditText
+                android:layout_width="0dp"
+                android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:textSize="@dimen/textSize_medium"
-                android:id="@+id/textView_main_productDispatch"/>
+                android:id="@+id/editText_main_coinSlot"
+                android:inputType="number" />
+
+                <Button
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:id="@+id/button_main_insertCoin"
+                android:text="Insert"/>
+
+                <Button
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:id="@+id/button_main_moneyBack"
+                android:text="@string/money_back"/>
+
+            </LinearLayout>
 
         </LinearLayout>
-
-
-    </ScrollView>
 
 </RelativeLayout>

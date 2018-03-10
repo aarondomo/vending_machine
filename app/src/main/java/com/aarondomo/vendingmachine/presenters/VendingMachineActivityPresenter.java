@@ -8,6 +8,7 @@ import com.aarondomo.vendingmachine.utils.CoinsUtil;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public class VendingMachineActivityPresenter {
 
@@ -17,11 +18,15 @@ public class VendingMachineActivityPresenter {
 
         void returnCoin(String coinValue);
 
+        void returnInvalidCoin(String coinValue);
+
         void displayDelayedMessage(String message);
 
         void displayProducts(List<Product> products);
 
         void showDispatchedProductAlert(Product product);
+
+        void showChangeCoins(Map<Integer, Integer> coinsMap);
 
     }
 
@@ -63,7 +68,7 @@ public class VendingMachineActivityPresenter {
             insertedCoins.add(coin);
             view.displayMessage(Integer.toString(CoinsUtil.getCoinsValue(insertedCoins)));
         } else{
-            view.returnCoin(coinValue);
+            view.returnInvalidCoin(coinValue);
         }
     }
 
@@ -91,7 +96,7 @@ public class VendingMachineActivityPresenter {
                 view.displayMessage(THANK_YOU_MSG);
                 view.showDispatchedProductAlert(product);
                 view.displayDelayedMessage(INSERT_COIN_MSG);
-                view.returnCoin(getReturnCoinMessage(changeCoins));
+                displayReturnedCoins(changeCoins);
             } else {
                 displayMessageAndDelayedAmount(EXACT_CHANGE_MSG);
             }
@@ -100,6 +105,12 @@ public class VendingMachineActivityPresenter {
         }
     }
 
+
+    public void getMoneyBack() {
+        displayReturnedCoins(insertedCoins);
+        insertedCoins.clear();
+        view.displayMessage(INSERT_COIN_MSG);
+    }
 
     private void displayMessageAndDelayedAmount(String message){
         view.displayMessage(message);
@@ -115,13 +126,15 @@ public class VendingMachineActivityPresenter {
     }
 
     private String getReturnCoinMessage(List<Integer> coinList){
-        return "Total:" + CoinsUtil.getCoinsValue(coinList) + " " + CoinsUtil.getCoinMapString(coinList);
+        view.showChangeCoins(CoinsUtil.getCoinsMap(coinList));
+        return CoinsUtil.getCoinsValue(coinList) + " cents";
     }
 
-    public void getMoneyBack() {
-        view.returnCoin(getReturnCoinMessage(insertedCoins));
-        insertedCoins.clear();
-        view.displayMessage(INSERT_COIN_MSG);
+    private void displayReturnedCoins(List<Integer> coinList){
+        if(coinList != null && !coinList.isEmpty()){
+            view.returnCoin(getReturnCoinMessage(coinList));
+            view.showChangeCoins(CoinsUtil.getCoinsMap(coinList));
+        }
     }
 
 

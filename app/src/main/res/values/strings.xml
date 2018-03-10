@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">VendingMachine</string>
+    <string name="app_name">Vending Machine</string>
     <string name="insert_coin">INSERT COIN</string>
     <string name="money_back">Money Back</string>
 </resources>

@@ -14,17 +14,20 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
 import com.aarondomo.vendingmachine.di.DaggerVendingMachineComponent;
 import com.aarondomo.vendingmachine.di.VendingMachineModule;
+import com.aarondomo.vendingmachine.model.Coins;
 import com.aarondomo.vendingmachine.presenters.VendingMachineActivityPresenter;
 import com.aarondomo.vendingmachine.R;
 import com.aarondomo.vendingmachine.model.Product;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -36,6 +39,8 @@ public class VendingMachineActivity extends AppCompatActivity implements Vending
     private Button buttonInsertCoin;
     private Button buttonMoneyBack;
     private TextView textViewCoinReturn;
+    private LinearLayout linearLayoutReturnCoinTray;
+
     private DisplayMetrics displayMetrics;
 
     @Inject
@@ -45,6 +50,7 @@ public class VendingMachineActivity extends AppCompatActivity implements Vending
     private static final String DISPATCHED_PRODUCT = "Dispatched product: ";
     private static final String TAKE_PRODUCT = "Take Product";
     private static final String ENJOY = "Enjoy!";
+    private static final String MONEY_COLLECTED = "Money Collected";
     private static final String EMPTY_STRING = "";
     private static final int DELAY_TIME = 1000;
     private static final int COLUMN_NUMBER = 2;
@@ -81,6 +87,7 @@ public class VendingMachineActivity extends AppCompatActivity implements Vending
         buttonInsertCoin = (Button) findViewById(R.id.button_main_insertCoin);
         buttonMoneyBack = (Button) findViewById(R.id.button_main_moneyBack);
         textViewCoinReturn = (TextView) findViewById(R.id.textView_main_coinReturn);
+        linearLayoutReturnCoinTray = (LinearLayout) findViewById(R.id.linearlayout_main_coin_return_tray);
     }
 
     private void setUpButtonInsertCoinOnClickListener(){
@@ -128,9 +135,17 @@ public class VendingMachineActivity extends AppCompatActivity implements Vending
         textViewCoinReturn.setText(COIN_RETURN + coinValue);
     }
 
+    @Override
+    public void returnInvalidCoin(String coinValue){
+        returnCoin(coinValue);
+        showInvalidCoin();
+    }
+
     private void getCoin(){
         String coinValue = editTextCoinSlot.getText().toString();
-        presenter.receiveCoin(coinValue);
+        if(!coinValue.equals(EMPTY_STRING)){
+            presenter.receiveCoin(coinValue);
+        }
     }
 
     @Override
@@ -155,7 +170,7 @@ public class VendingMachineActivity extends AppCompatActivity implements Vending
     private ImageButton setUpProductButton(final Product product){
 
         ImageButton productButton = new ImageButton(this);
-        productButton.setImageBitmap(resize(product.getPicture()));
+        productButton.setImageBitmap(resize(product.getPicture(), getImageWidth()));
 
         productButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -171,10 +186,9 @@ public class VendingMachineActivity extends AppCompatActivity implements Vending
         getWindowManager().getDefaultDisplay().getRealMetrics(displayMetrics);
     }
 
-    private Bitmap resize(int pictureResource) {
+    private Bitmap resize(int pictureResource, int size) {
         Drawable image = getResources().getDrawable(pictureResource);
         Bitmap bitmap = ((BitmapDrawable)image).getBitmap();
-        int size = getImageWidth();
         Bitmap bitmapResized = Bitmap.createScaledBitmap(bitmap, size, size, false);
         return bitmapResized;
     }
@@ -211,6 +225,58 @@ public class VendingMachineActivity extends AppCompatActivity implements Vending
         InputMethodManager inputMethodManager =
                 (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+    }
+
+    public void showChangeCoins(Map<Integer, Integer> coinsMap){
+        linearLayoutReturnCoinTray.removeAllViews();
+        for(Integer coinKey : coinsMap.keySet()){
+            int imageRes = 0;
+
+            switch(coinKey){
+                case Coins.TWENTY_FIVE_CENTS:
+                    imageRes = R.drawable.twenty_five_cents_128;
+                    break;
+                case Coins.TEN_CENTS:
+                    imageRes = R.drawable.ten_cents_128;
+                    break;
+                case Coins.FIVE_CENTS:
+                    imageRes = R.drawable.five_cents_128;
+                    break;
+            }
+            for(int i = 0; i < coinsMap.get(coinKey); i++){
+                linearLayoutReturnCoinTray.addView(getCoinImageView(imageRes));
+            }
+        }
+    }
+
+    private void showInvalidCoin(){
+        linearLayoutReturnCoinTray.removeAllViews();
+        int imageRes = R.drawable.unknown_coin_128;
+        linearLayoutReturnCoinTray.addView(getCoinImageView(imageRes));
+    }
+
+
+    private ImageView getCoinImageView(int imageRes){
+        ImageView coinImage = new ImageView(this);
+        coinImage.setImageBitmap(resize(imageRes, getImageWidth() / 3));
+        coinImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                cleanCoinReturnTray();
+            }
+        });
+        return coinImage;
+    }
+
+    private void cleanCoinReturnTray(){
+        textViewCoinReturn.setText(MONEY_COLLECTED);
+        textViewCoinReturn.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                textViewCoinReturn.setText(EMPTY_STRING);
+            }
+        }, DELAY_TIME / 2);
+        linearLayoutReturnCoinTray.removeAllViews();
     }
 
 }

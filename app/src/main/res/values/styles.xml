@@ -8,4 +8,7 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="VendingMachineTheme" parent="AppTheme">
+        <item name="colorPrimary">@color/colorPrimaryVendingMachine</item>
+    </style>
 </resources>
